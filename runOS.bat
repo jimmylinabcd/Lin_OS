@@ -1,0 +1,1 @@
+qemu-system-x86_64 -drive file=OS.bin,format=raw,index=0,media=disk  -L "C:\Program Files\qemu"
