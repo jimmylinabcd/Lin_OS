@@ -56,16 +56,18 @@ modules for functions to decluter kernel
 
 // Defining functions
 void print(int row, int column, int colour, const char *string);
-void clear();
+void clear(int row);
+void input();
 
 // Need extern for assembly to load kernel
 extern "C" void main(){
     volatile char *postion = (volatile char*)0xB8000; // where the current pointer is in VID_MEM to print afterwards
     
+    //Start up
     print(0, 0, LIGHT_CYAN, "   _      _          ____   _____ ");
     print(1, 0, LIGHT_CYAN, "  | |    (_)        / __ \\ / ____|");
     print(2, 0, LIGHT_CYAN, "  | |     _ _ __   | |  | | (___  ");
-    print(3, 0,LIGHT_CYAN, "  | |    | | '_ \\  | |  | |\\___ \\ ");
+    print(3, 0, LIGHT_CYAN, "  | |    | | '_ \\  | |  | |\\___ \\ ");
     print(4, 0, LIGHT_CYAN, "  | |____| | | | | | |__| |____) |");
     print(5, 0, LIGHT_CYAN, "  |______|_|_| |_|  \\____/|_____/ ");
 
@@ -85,6 +87,31 @@ void print(int row, int column,int colour, const char *string){
     }
 }
 
-void clear(){
-    // WIP
+void clear(int row){
+    // 0 for clear all
+    if(row == 0){
+        volatile char *video = (volatile char*)0xB8000;
+        int pos = 0;
+        while(pos<(SCREEN_COLUMNS * SCREEN_ROWS * 2))
+        {
+            *video = 0;
+            *video++;
+            *video = 1;
+            pos++;
+        }
+    }else{
+        volatile char *video = (volatile char*)0xB8000 + (row * SCREEN_COLUMNS * 2);
+        for(int i = 0; i < SCREEN_COLUMNS; i++){
+            *video = 0;
+            *video++;
+            *video = BLACK;
+            *video++;
+        }
+    }
+
+    
+}
+
+void input(){
+    //WIP
 }
