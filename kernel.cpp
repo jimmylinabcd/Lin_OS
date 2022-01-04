@@ -58,6 +58,7 @@ modules for functions to decluter kernel
 void print(int row, int column, int colour, const char *string);
 void clear(int row);
 void scroll();
+void scroll_up();
 void input();
 
 int current_line = 0;
@@ -137,6 +138,10 @@ void scroll(){
         }
     }
     
+}
+
+void scroll_up(){
+    //WIP
 }
 
 void input(){

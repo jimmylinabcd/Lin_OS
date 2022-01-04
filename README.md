@@ -4,11 +4,12 @@ A simple kernel I've been coding for fun and learning. I haven't tested it on a 
 # Features
 * Boots up :)
 * Able to print text in colours!
+* Scrolling
 
 # Future plans
 - [ ] Keyboard driver (version 1)
 - [ ] Can type (Version 1.01)
-- [ ] Scrolling (version 1.1)
+- [*] Scrolling (version 1.1)
 - [ ] Basic commands (version 1.2)
 - [ ] User login system (version 1.3)
 - [ ] More commands (version 1.4)
