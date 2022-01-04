@@ -19,7 +19,6 @@ keyboard driver
 get the time from bios
 commands:
     man
-    cal
     time
     cal
     cls
@@ -35,6 +34,7 @@ modules for functions to decluter kernel
 #define VID_MEM 0xb8000 //VID_MEM addr increments by 2 to move postion and 1 to switch colour
 #define SCREEN_ROWS 25
 #define SCREEN_COLUMNS 80
+#define ROW_SIZE (SCREEN_COLUMNS * 2)
 
 //Colours
 #define BLACK 0
@@ -57,7 +57,10 @@ modules for functions to decluter kernel
 // Defining functions
 void print(int row, int column, int colour, const char *string);
 void clear(int row);
+void scroll();
 void input();
+
+int current_line = 0;
 
 // Need extern for assembly to load kernel
 extern "C" void main(){
@@ -73,45 +76,69 @@ extern "C" void main(){
 
     print(7, 0,GREEN, "Successful boot! Welcome to Lin OS.");
 
-    //while(true){}
+    //while(true){
     print(9, 0, WHITE, ">>>");
-    print(9, 4, WHITE, "Hello World");
+    current_line = 9;
+    input();
+    scroll();
+    //}
     return;
 }
 
 void print(int row, int column,int colour, const char *string){
-    volatile char *video = (volatile char*)0xB8000 + (row * SCREEN_COLUMNS * 2) + (column * 2); // * 2 because each row has 160 vals because 2 addrs for each location
+    volatile char *VRAM = (volatile char*)0xB8000 + (row * SCREEN_COLUMNS * 2) + (column * 2); // * 2 because each row has 160 vals because 2 addrs for each location
     while(*string != 0){
-        *video++ = *string++;
-        *video++ = colour;
+        *VRAM++ = *string++;
+        *VRAM++ = colour;
     }
 }
 
 void clear(int row){
     // 0 for clear all
     if(row == 0){
-        volatile char *video = (volatile char*)0xB8000;
+        volatile char *VRAM = (volatile char*)0xB8000;
         int pos = 0;
         while(pos<(SCREEN_COLUMNS * SCREEN_ROWS * 2))
         {
-            *video = 0;
-            *video++;
-            *video = 1;
+            *VRAM = 0;
+            *VRAM++;
+            *VRAM = 1;
             pos++;
         }
     }else{
-        volatile char *video = (volatile char*)0xB8000 + (row * SCREEN_COLUMNS * 2);
+        volatile char *VRAM = (volatile char*)0xB8000 + (row * ROW_SIZE);
         for(int i = 0; i < SCREEN_COLUMNS; i++){
-            *video = 0;
-            *video++;
-            *video = BLACK;
-            *video++;
+            *VRAM = 0;
+            *VRAM++;
+            *VRAM = BLACK;
+            *VRAM++;
+        }
+    }  
+}
+
+void scroll(){
+    current_line -= 1;
+    volatile char *VRAM = (volatile char*)0xB8000;
+    for(int i = 0; i < SCREEN_COLUMNS; i++){
+            *VRAM = 0;
+            *VRAM++;
+            *VRAM = BLACK;
+            *VRAM++;
+    }
+    VRAM = (volatile char*)0xB8000 + ROW_SIZE; //leave initial line blank
+    for(int i = 0; i < SCREEN_ROWS; i++){
+        for(int x = 0; x < SCREEN_COLUMNS; x++){
+            char *ptr = (char *)VRAM + ROW_SIZE;
+            int *ptrc = (int *)VRAM + ROW_SIZE;
+            *VRAM = *ptr;
+            *VRAM++;
+            *VRAM = ptr[1];
+            *VRAM++;
         }
     }
-
     
 }
 
 void input(){
-    //WIP
+    // WIP
 }
